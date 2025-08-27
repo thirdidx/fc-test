@@ -15,9 +15,8 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Modern Web Stack - Firecrawl Demo',
-  description:
-    "A blazing-fast web application built with Next.js, Tailwind CSS, shadcn/ui, and Zustand, inspired by Firecrawl's design system.",
+  title: 'FC Scrape Demo',
+  description: 'scrape any website with ease',
 }
 
 export default function RootLayout({
