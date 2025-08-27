@@ -28,6 +28,7 @@ export type RecentRun = {
   status: 'success' | 'error' | 'loading'
   timestamp: Date
   result?: ScrapeResult
+  formats?: string[]
 }
 
 export const copyToClipboard = async (text: string): Promise<void> => {
