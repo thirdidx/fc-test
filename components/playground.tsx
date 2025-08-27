@@ -9,19 +9,8 @@ import {useAppStore} from '@/lib/store'
 import {copyToClipboard, parseImagesFromHtml, downloadImage, formatUrl, type RecentRun} from '@/lib/utils'
 
 export function Playground() {
-  const {
-    url,
-    isLoading,
-    result,
-    activeTab,
-    recentRuns,
-    setUrl,
-    setIsLoading,
-    setResult,
-    setActiveTab,
-    addRecentRun,
-    updateRecentRun,
-  } = useAppStore()
+  const {url, isLoading, result, activeTab, recentRuns, setUrl, setIsLoading, setResult, setActiveTab, addRecentRun, updateRecentRun} =
+    useAppStore()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -89,9 +78,7 @@ export function Playground() {
           <CardContent className="p-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="flex gap-2">
-                <div className="flex items-center bg-muted px-3 py-2 rounded-md text-sm text-muted-foreground border">
-                  https://
-                </div>
+                <div className="flex items-center bg-muted px-3 py-2 rounded-md text-sm text-muted-foreground border">https://</div>
                 <input
                   type="text"
                   value={url}
@@ -105,9 +92,6 @@ export function Playground() {
               <div className="flex items-center justify-between">
                 <div></div>
                 <div className="flex gap-2">
-                  <Button variant="outline" type="button">
-                    Get code
-                  </Button>
                   <Button type="submit" disabled={!url.trim() || isLoading} className="bg-primary hover:bg-primary/90">
                     {isLoading ? (
                       <>
@@ -174,11 +158,7 @@ export function Playground() {
             <CardContent>
               {result.success ? (
                 <div className="space-y-4">
-                  <Tabs
-                    value={activeTab}
-                    onValueChange={(value: string) => setActiveTab(value as typeof activeTab)}
-                    className="w-full"
-                  >
+                  <Tabs value={activeTab} onValueChange={(value: string) => setActiveTab(value as typeof activeTab)} className="w-full">
                     <TabsList className="grid w-full grid-cols-3">
                       <TabsTrigger value="markdown">Markdown</TabsTrigger>
                       <TabsTrigger value="media">Media ({result.data?.images?.length || 0})</TabsTrigger>
@@ -186,9 +166,7 @@ export function Playground() {
                     </TabsList>
                     <TabsContent value="markdown" className="mt-4">
                       <div className="bg-muted p-4 rounded border max-h-96 overflow-y-auto">
-                        <pre className="whitespace-pre-wrap text-sm font-mono">
-                          {result.data?.markdown || 'No markdown content'}
-                        </pre>
+                        <pre className="whitespace-pre-wrap text-sm font-mono">{result.data?.markdown || 'No markdown content'}</pre>
                       </div>
                     </TabsContent>
                     <TabsContent value="media" className="mt-4">
