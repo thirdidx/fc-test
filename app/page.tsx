@@ -14,7 +14,7 @@ type ScrapeResult = {
   data?: {
     markdown: string
     html: string
-    metadata: any
+    metadata: Record<string, unknown>
   }
   error?: string
 }
@@ -98,7 +98,7 @@ export default function FirecrawlPlayground() {
           )
         )
       }
-    } catch (error) {
+    } catch {
       const errorResult = { success: false, error: 'Network error occurred' }
       setResult(errorResult)
       setRecentRuns(prev => 

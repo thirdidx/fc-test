@@ -49,34 +49,35 @@ export async function POST(request: NextRequest) {
         }
       })
 
-    } catch (firecrawlError: any) {
+    } catch (firecrawlError: unknown) {
       console.error('Firecrawl API error:', firecrawlError)
       
       // Return more specific error messages
-      if (firecrawlError.message?.includes('401') || firecrawlError.message?.includes('unauthorized')) {
+      const errorMessage = firecrawlError instanceof Error ? firecrawlError.message : String(firecrawlError)
+      if (errorMessage?.includes('401') || errorMessage?.includes('unauthorized')) {
         return NextResponse.json(
           { error: 'Invalid API key. Please check your Firecrawl API key.' },
           { status: 401 }
         )
-      } else if (firecrawlError.message?.includes('403') || firecrawlError.message?.includes('forbidden')) {
+      } else if (errorMessage?.includes('403') || errorMessage?.includes('forbidden')) {
         return NextResponse.json(
           { error: 'Access forbidden. Please check your API key permissions.' },
           { status: 403 }
         )
-      } else if (firecrawlError.message?.includes('429') || firecrawlError.message?.includes('rate limit')) {
+      } else if (errorMessage?.includes('429') || errorMessage?.includes('rate limit')) {
         return NextResponse.json(
           { error: 'Rate limit exceeded. Please try again later.' },
           { status: 429 }
         )
       } else {
         return NextResponse.json(
-          { error: `Scraping failed: ${firecrawlError.message || 'Unknown error'}` },
+          { error: `Scraping failed: ${errorMessage || 'Unknown error'}` },
           { status: 500 }
         )
       }
     }
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('API route error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
