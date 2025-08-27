@@ -1,8 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Firecrawl Web Scraper
+
+A Next.js application for scraping and extracting clean data from websites using the Firecrawl API.
+
+## Features
+
+- Clean web scraping interface
+- Extract content in multiple formats (Markdown, HTML)
+- Metadata extraction
+- Real-time scraping with loading states
+- Mock mode for development without API key
+
+## Prerequisites
+
+- Node.js 18+ 
+- npm, yarn, pnpm, or bun
+- Firecrawl API key (optional for development)
 
 ## Getting Started
 
-First, run the development server:
+### 1. Install Dependencies
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+# or
+bun install
+```
+
+### 2. Environment Setup
+
+Copy the `.env.example` file to `.env`:
+
+```bash
+cp .env.example .env
+```
+
+Add your Firecrawl API key to the `.env` file:
+- Get your API key from [https://firecrawl.dev](https://firecrawl.dev)
+- Add it to the `FIRECRAWL_API_KEY` variable in your `.env` file
+
+Note: The app will work without an API key using mock responses for development.
+
+### 3. Run the Development Server
 
 ```bash
 npm run dev
@@ -14,23 +56,49 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to use the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Usage
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Enter a URL in the input field
+2. Click "Scrape" to extract content
+3. View the extracted content in different formats:
+   - Markdown view for clean, formatted text
+   - HTML view for structured content
+   - Metadata for page information
 
-## Learn More
+## Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+- **Framework**: Next.js 15 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: Radix UI with custom components
+- **State Management**: Zustand
+- **API**: Firecrawl v2 for web scraping
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+fc-test/
+├── app/                  # Next.js app directory
+│   ├── api/             # API routes
+│   │   └── scrape/      # Scraping endpoint
+│   ├── layout.tsx       # Root layout
+│   └── page.tsx         # Main page
+├── components/          # React components
+│   ├── playground.tsx   # Main scraping interface
+│   └── ui/             # Reusable UI components
+└── lib/                # Utility functions
+```
 
-## Deploy on Vercel
+## Development
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The application includes:
+- TypeScript for type safety
+- Tailwind CSS for styling
+- Prettier configuration for code formatting
+- Turbopack for fast development builds
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License
+
+Private project
