@@ -1,4 +1,4 @@
-import { FirecrawlLogo } from './firecrawl-logo'
+import {FirecrawlLogo} from './firecrawl-logo'
 
 export function ScrapingAnimation() {
   return (
