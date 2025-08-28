@@ -18,6 +18,7 @@ export type ScrapeResult = {
     html: string
     images: ImageData[]
     metadata: Record<string, unknown>
+    screenshot?: string
   }
   error?: string
 }

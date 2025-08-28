@@ -11,14 +11,10 @@ export async function POST(request: NextRequest) {
 
     // Initialize Firecrawl client
     const apiKey = process.env.FIRECRAWL_API_KEY
-    console.log('API Key present:', !!apiKey, apiKey ? 'Key starts with: ' + apiKey.substring(0, 10) : 'No key')
 
     if (!apiKey || apiKey === 'fc-your-api-key-here') {
-      console.log('Using mock response - no valid API key')
       return getMockResponse(url)
     }
-
-    console.log('Using real Firecrawl API for URL:', url)
 
     try {
       // Call the Firecrawl API v2 with correct structure
@@ -43,9 +39,6 @@ export async function POST(request: NextRequest) {
 
       const result = await response.json()
 
-      // Log the full response for debugging
-      console.log('Firecrawl API response:', JSON.stringify(result, null, 2))
-
       // Firecrawl v2 API response structure
       // The API should return { success: true, data: { markdown, html, metadata, ... } }
       return NextResponse.json({
@@ -60,8 +53,6 @@ export async function POST(request: NextRequest) {
         },
       })
     } catch (firecrawlError: unknown) {
-      console.error('Firecrawl API error:', firecrawlError)
-
       // Return more specific error messages
       const errorMessage = firecrawlError instanceof Error ? firecrawlError.message : String(firecrawlError)
       if (errorMessage?.includes('401') || errorMessage?.includes('unauthorized')) {
@@ -75,7 +66,6 @@ export async function POST(request: NextRequest) {
       }
     }
   } catch (error: unknown) {
-    console.error('API route error:', error)
     return NextResponse.json({error: 'Internal server error'}, {status: 500})
   }
 }

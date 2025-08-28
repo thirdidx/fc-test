@@ -4,32 +4,25 @@ import {useState, useEffect} from 'react'
 import {Button} from '@/components/ui/button'
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card'
 import {ScrapingAnimation} from '@/components/scraping-animation'
-import {
-  Loader2,
-  Copy,
-  Check,
-  Code,
-  Link2,
-  FileText,
-  Camera,
-  FileJson,
-  Settings2,
-  ArrowUpRight,
-  CircleDot,
-  Download,
-  ExternalLink,
-} from 'lucide-react'
-import {useAppStore, type FormatOption} from '@/lib/store'
+import {Loader2, Copy, Check, Code, FileText, Camera, FileJson, ArrowUpRight, CircleDot, Download, ExternalLink} from 'lucide-react'
+import {useAppStore, type FormatType} from '@/lib/store'
 import {copyToClipboard, parseImagesFromHtml, formatUrl, downloadImage, type RecentRun} from '@/lib/utils'
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion'
 import {Checkbox} from '@/components/ui/checkbox'
 import {Badge} from '@/components/ui/badge'
 import {Tabs, TabsList, TabsTrigger, TabsContent} from '@/components/ui/tabs'
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from '@/components/ui/tooltip'
 
-const formatOptions: FormatOption[] = [
+type LocalFormatOption = {
+  id: FormatType
+  label: string
+  icon: string
+  disabled?: boolean
+  subOptions?: {label: string; value: string}[]
+}
+
+const formatOptions: LocalFormatOption[] = [
   {id: 'markdown', label: 'Markdown', icon: 'M'},
-  {id: 'summary', label: 'Summary', icon: '≡'},
-  {id: 'links', label: 'Links', icon: '🔗'},
   {
     id: 'html',
     label: 'HTML',
@@ -39,6 +32,7 @@ const formatOptions: FormatOption[] = [
       {label: 'Raw', value: 'raw'},
     ],
   },
+  {id: 'json', label: 'JSON', icon: '{}'},
   {
     id: 'screenshot',
     label: 'Screenshot',
@@ -48,7 +42,6 @@ const formatOptions: FormatOption[] = [
       {label: 'Full Page', value: 'fullpage'},
     ],
   },
-  {id: 'json', label: 'JSON', icon: '{}'},
 ]
 
 export function Playground() {
@@ -132,18 +125,14 @@ export function Playground() {
     }
   }
 
-  const getFormatIcon = (format: FormatOption) => {
+  const getFormatIcon = (format: LocalFormatOption) => {
     switch (format.id) {
-      case 'links':
-        return <Link2 className="h-4 w-4" />
       case 'html':
         return <Code className="h-4 w-4" />
       case 'screenshot':
         return <Camera className="h-4 w-4" />
       case 'json':
         return <FileJson className="h-4 w-4" />
-      case 'summary':
-        return <FileText className="h-4 w-4" />
       case 'markdown':
       default:
         return <FileText className="h-4 w-4" />
@@ -155,7 +144,7 @@ export function Playground() {
       {/* Header Section */}
       <div className="text-center space-y-2 pt-6">
         <h1 className="text-2xl sm:text-3xl font-bold">Web Scraper</h1>
-        <p className="text-sm sm:text-base text-muted-foreground">Extract content from any website in multiple formats</p>
+        <p className="text-sm sm:text-base text-muted-foreground">Extract clean data from any webpage in seconds</p>
       </div>
 
       {/* Input Section */}
@@ -163,7 +152,9 @@ export function Playground() {
         <CardContent className="p-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex flex-col sm:flex-row gap-2">
-              <div className="flex items-center bg-muted px-3 py-2 rounded-md text-sm text-muted-foreground border whitespace-nowrap">https://</div>
+              <div className="flex items-center bg-muted px-3 py-2 rounded-md text-sm text-muted-foreground border whitespace-nowrap">
+                https://
+              </div>
               <input
                 type="text"
                 value={url}
@@ -176,8 +167,6 @@ export function Playground() {
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
               <div className="flex items-center gap-2">
-                <Settings2 className="h-4 w-4 text-muted-foreground hidden sm:block" />
-
                 <div className="relative">
                   <Button
                     type="button"
@@ -212,11 +201,14 @@ export function Playground() {
                               <Checkbox
                                 id={format.id}
                                 checked={selectedFormats.includes(format.id)}
-                                onCheckedChange={() => toggleFormat(format.id)}
+                                onCheckedChange={() => !format.disabled && toggleFormat(format.id)}
+                                disabled={format.disabled}
                               />
                               <label
                                 htmlFor={format.id}
-                                className="flex items-center gap-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                                className={`flex items-center gap-2 text-sm font-medium leading-none ${
+                                  format.disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+                                }`}
                               >
                                 {getFormatIcon(format)}
                                 {format.label}
@@ -227,7 +219,11 @@ export function Playground() {
                                 {format.subOptions.map((option) => (
                                   <label
                                     key={option.value}
-                                    className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer"
+                                    className={`flex items-center gap-2 text-sm ${
+                                      format.disabled
+                                        ? 'text-muted-foreground/50 cursor-not-allowed'
+                                        : 'text-muted-foreground cursor-pointer'
+                                    }`}
                                   >
                                     <input
                                       type="radio"
@@ -244,6 +240,7 @@ export function Playground() {
                                           setScreenshotOption(e.target.value as 'viewport' | 'fullpage')
                                         }
                                       }}
+                                      disabled={format.disabled}
                                       className="h-3 w-3"
                                     />
                                     {option.label}
@@ -272,7 +269,11 @@ export function Playground() {
                   <span className="hidden sm:inline">Get code</span>
                   <span className="sm:hidden">Code</span>
                 </Button>
-                <Button type="submit" disabled={!url.trim() || isLoading} className="bg-orange-500 hover:bg-orange-600 text-white w-full sm:w-auto">
+                <Button
+                  type="submit"
+                  disabled={!url.trim() || isLoading}
+                  className="bg-orange-500 hover:bg-orange-600 text-white w-full sm:w-auto"
+                >
                   {isLoading ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -306,7 +307,7 @@ export function Playground() {
           value={isAccordionOpen ? 'results' : ''}
           onValueChange={(value) => setAccordionOpen(value === 'results')}
         >
-          <AccordionItem value="results" className="border rounded-lg">
+          <AccordionItem value="results" className="border rounded-lg bg-white">
             <div className="flex items-center justify-between px-6">
               <AccordionTrigger className="flex-1 py-4 hover:no-underline">
                 <div className="flex items-center gap-3">
@@ -328,7 +329,11 @@ export function Playground() {
                     if (activeTab === 'markdown') {
                       contentToCopy = result.data?.markdown || ''
                     } else if (activeTab === 'media') {
-                      contentToCopy = JSON.stringify(result.data?.images || [], null, 2)
+                      const mediaData = {
+                        screenshot: result.data?.screenshot || null,
+                        images: result.data?.images || [],
+                      }
+                      contentToCopy = JSON.stringify(mediaData, null, 2)
                     } else if (activeTab === 'raw') {
                       contentToCopy = JSON.stringify(result.data, null, 2)
                     }
@@ -344,9 +349,15 @@ export function Playground() {
               {result.success ? (
                 <Tabs value={activeTab} onValueChange={(value: string) => setActiveTab(value as typeof activeTab)} className="w-full">
                   <TabsList className="grid w-full grid-cols-3 h-auto p-1">
-                    <TabsTrigger value="markdown" className="text-xs sm:text-sm py-1.5">Markdown</TabsTrigger>
-                    <TabsTrigger value="media" className="text-xs sm:text-sm py-1.5">Media ({result.data?.images?.length || 0})</TabsTrigger>
-                    <TabsTrigger value="raw" className="text-xs sm:text-sm py-1.5">Raw JSON</TabsTrigger>
+                    <TabsTrigger value="markdown" className="text-xs sm:text-sm py-1.5">
+                      Markdown
+                    </TabsTrigger>
+                    <TabsTrigger value="media" className="text-xs sm:text-sm py-1.5">
+                      Media ({(result.data?.images?.length || 0) + (result.data?.screenshot ? 1 : 0)})
+                    </TabsTrigger>
+                    <TabsTrigger value="raw" className="text-xs sm:text-sm py-1.5">
+                      Raw JSON
+                    </TabsTrigger>
                   </TabsList>
                   <TabsContent value="markdown" className="mt-4">
                     <div className="bg-muted p-4 rounded border max-h-96 overflow-y-auto">
@@ -354,67 +365,112 @@ export function Playground() {
                     </div>
                   </TabsContent>
                   <TabsContent value="media" className="mt-4">
-                    <div className="bg-muted p-4 rounded border max-h-96 overflow-y-auto">
-                      {result.data?.images && result.data.images.length > 0 ? (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-4">
-                          {result.data.images.map((image, index) => (
-                            <div
-                              key={index}
-                              className="group relative bg-background rounded-lg border p-2 hover:shadow-md transition-shadow"
-                            >
-                              <div className="aspect-square rounded overflow-hidden bg-muted mb-2">
-                                <img
-                                  src={image.src}
-                                  alt={image.alt}
-                                  className="w-full h-full object-cover"
-                                  loading="lazy"
-                                  onError={(e) => {
-                                    const target = e.target as HTMLImageElement
-                                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjVmNWY1Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+SW1hZ2U8L3RleHQ+PC9zdmc+'
-                                  }}
-                                />
-                              </div>
-                              <div className="flex items-center justify-between">
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-xs font-medium truncate" title={image.alt}>
-                                    {image.alt}
-                                  </p>
-                                  {image.title && (
-                                    <p className="text-xs text-muted-foreground truncate" title={image.title}>
-                                      {image.title}
-                                    </p>
-                                  )}
-                                </div>
-                                <div className="flex gap-1 ml-2">
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-6 w-6 p-0"
-                                    onClick={() => window.open(image.src, '_blank')}
-                                    title="View full size"
-                                  >
-                                    <ExternalLink className="h-3 w-3" />
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-6 w-6 p-0"
-                                    onClick={() => downloadImage(image.src, `image-${index + 1}.jpg`)}
-                                    title="Download image"
-                                  >
-                                    <Download className="h-3 w-3" />
-                                  </Button>
-                                </div>
+                    <div className="bg-muted p-4 rounded border max-h-96 overflow-y-auto space-y-4">
+                      {/* Screenshots */}
+                      {result.data?.screenshot && (
+                        <div>
+                          <h4 className="text-sm font-medium mb-2">Screenshot</h4>
+                          <div className="bg-background rounded-lg border p-2">
+                            <div className="aspect-video rounded overflow-hidden bg-muted">
+                              <img
+                                src={result.data.screenshot}
+                                alt="Page Screenshot"
+                                className="w-full h-full object-contain"
+                                loading="lazy"
+                              />
+                            </div>
+                            <div className="flex items-center justify-between mt-2">
+                              <span className="text-xs font-medium">Page Screenshot</span>
+                              <div className="flex gap-1">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-6 w-6 p-0"
+                                  onClick={() => window.open(result.data?.screenshot!, '_blank')}
+                                  title="View full size"
+                                >
+                                  <ExternalLink className="h-3 w-3" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-6 w-6 p-0"
+                                  onClick={() => downloadImage(result.data?.screenshot!, 'screenshot.jpg')}
+                                  title="Download screenshot"
+                                >
+                                  <Download className="h-3 w-3" />
+                                </Button>
                               </div>
                             </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="text-center py-8 text-muted-foreground">
-                          <div className="mb-2">🖼️</div>
-                          <p>No images found on this page</p>
+                          </div>
                         </div>
                       )}
+
+                      {/* Images */}
+                      {result.data?.images && result.data.images.length > 0 ? (
+                        <div>
+                          <h4 className="text-sm font-medium mb-2">Images from Page</h4>
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-4">
+                            {result.data.images.map((image, index) => (
+                              <div
+                                key={index}
+                                className="group relative bg-background rounded-lg border p-2 hover:shadow-md transition-shadow"
+                              >
+                                <div className="aspect-square rounded overflow-hidden bg-muted mb-2">
+                                  <img
+                                    src={image.src}
+                                    alt={image.alt}
+                                    className="w-full h-full object-cover"
+                                    loading="lazy"
+                                    onError={(e) => {
+                                      const target = e.target as HTMLImageElement
+                                      target.src =
+                                        'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjVmNWY1Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+SW1hZ2U8L3RleHQ+PC9zdmc+'
+                                    }}
+                                  />
+                                </div>
+                                <div className="flex items-center justify-between">
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-xs font-medium truncate" title={image.alt}>
+                                      {image.alt}
+                                    </p>
+                                    {image.title && (
+                                      <p className="text-xs text-muted-foreground truncate" title={image.title}>
+                                        {image.title}
+                                      </p>
+                                    )}
+                                  </div>
+                                  <div className="flex gap-1 ml-2">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-6 w-6 p-0"
+                                      onClick={() => window.open(image.src, '_blank')}
+                                      title="View full size"
+                                    >
+                                      <ExternalLink className="h-3 w-3" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-6 w-6 p-0"
+                                      onClick={() => downloadImage(image.src, `image-${index + 1}.jpg`)}
+                                      title="Download image"
+                                    >
+                                      <Download className="h-3 w-3" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ) : !result.data?.screenshot ? (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <div className="mb-2">🖼️</div>
+                          <p>No media found on this page</p>
+                        </div>
+                      ) : null}
                     </div>
                   </TabsContent>
                   <TabsContent value="raw" className="mt-4">
@@ -456,8 +512,12 @@ export function Playground() {
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2 sm:gap-3">
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-muted rounded flex items-center justify-center text-sm sm:text-lg font-bold">M</div>
-                      <span className="font-medium text-xs sm:text-sm truncate max-w-[120px] sm:max-w-[150px]">{run.url.replace(/^https?:\/\//, '')}</span>
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-muted rounded flex items-center justify-center text-sm sm:text-lg font-bold">
+                        M
+                      </div>
+                      <span className="font-medium text-xs sm:text-sm truncate max-w-[120px] sm:max-w-[150px]">
+                        {run.url.replace(/^https?:\/\//, '')}
+                      </span>
                     </div>
                     <ArrowUpRight className="h-4 w-4 text-orange-500" />
                   </div>
@@ -503,16 +563,27 @@ export function Playground() {
                       </div>
                     </div>
 
-                    <div>
+                    <div className="flex justify-between">
                       <span className="text-muted-foreground">Formats</span>
-                      <div className="flex gap-2 mt-1">
-                        {(run.formats || ['markdown']).map((format) => (
-                          <Badge key={format} variant="secondary" className="text-xs">
-                            {getFormatIcon(formatOptions.find((f) => f.id === format) || formatOptions[0])}
-                            {format.charAt(0).toUpperCase() + format.slice(1)}
-                          </Badge>
-                        ))}
-                      </div>
+                      <TooltipProvider>
+                        <div className="flex gap-1">
+                          {(run.formats || ['markdown']).map((format) => {
+                            const formatOption = formatOptions.find((f) => f.id === format)
+                            return formatOption ? (
+                              <Tooltip key={format}>
+                                <TooltipTrigger asChild>
+                                  <div className="p-1 rounded hover:bg-muted transition-colors cursor-pointer">
+                                    {getFormatIcon(formatOption)}
+                                  </div>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>{formatOption.label}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            ) : null
+                          })}
+                        </div>
+                      </TooltipProvider>
                     </div>
                   </div>
                 </CardContent>

@@ -2,7 +2,7 @@ import {create} from 'zustand'
 import {devtools} from 'zustand/middleware'
 import {ScrapeResult, RecentRun} from './utils'
 
-export type FormatType = 'markdown' | 'summary' | 'links' | 'html' | 'screenshot' | 'json'
+export type FormatType = 'markdown' | 'html' | 'screenshot' | 'json'
 
 export interface FormatOption {
   id: FormatType
@@ -43,7 +43,7 @@ export const useAppStore = create<AppState>()(
       result: null,
       activeTab: 'markdown',
       recentRuns: [],
-      selectedFormats: ['markdown', 'html'],
+      selectedFormats: ['markdown', 'html', 'json', 'screenshot'],
       isAccordionOpen: false,
 
       // Actions
