@@ -4,61 +4,70 @@ import {useState, useEffect} from 'react'
 import {Button} from '@/components/ui/button'
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card'
 import {ScrapingAnimation} from '@/components/scraping-animation'
-import {Loader2, Copy, Check, Code, Link2, FileText, Camera, FileJson, Settings2, ArrowUpRight, CircleDot, Download, ExternalLink} from 'lucide-react'
+import {
+  Loader2,
+  Copy,
+  Check,
+  Code,
+  Link2,
+  FileText,
+  Camera,
+  FileJson,
+  Settings2,
+  ArrowUpRight,
+  CircleDot,
+  Download,
+  ExternalLink,
+} from 'lucide-react'
 import {useAppStore, type FormatOption} from '@/lib/store'
 import {copyToClipboard, parseImagesFromHtml, formatUrl, downloadImage, type RecentRun} from '@/lib/utils'
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
-import {Checkbox} from "@/components/ui/checkbox"
-import {Badge} from "@/components/ui/badge"
+import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion'
+import {Checkbox} from '@/components/ui/checkbox'
+import {Badge} from '@/components/ui/badge'
 import {Tabs, TabsList, TabsTrigger, TabsContent} from '@/components/ui/tabs'
 
 const formatOptions: FormatOption[] = [
-  { id: 'markdown', label: 'Markdown', icon: 'M' },
-  { id: 'summary', label: 'Summary', icon: '≡' },
-  { id: 'links', label: 'Links', icon: '🔗' },
-  { 
-    id: 'html', 
+  {id: 'markdown', label: 'Markdown', icon: 'M'},
+  {id: 'summary', label: 'Summary', icon: '≡'},
+  {id: 'links', label: 'Links', icon: '🔗'},
+  {
+    id: 'html',
     label: 'HTML',
     icon: '<>',
     subOptions: [
-      { label: 'Cleaned', value: 'cleaned' },
-      { label: 'Raw', value: 'raw' }
-    ]
+      {label: 'Cleaned', value: 'cleaned'},
+      {label: 'Raw', value: 'raw'},
+    ],
   },
   {
     id: 'screenshot',
     label: 'Screenshot',
     icon: '[]',
     subOptions: [
-      { label: 'Viewport', value: 'viewport' },
-      { label: 'Full Page', value: 'fullpage' }
-    ]
+      {label: 'Viewport', value: 'viewport'},
+      {label: 'Full Page', value: 'fullpage'},
+    ],
   },
-  { id: 'json', label: 'JSON', icon: '{}' }
+  {id: 'json', label: 'JSON', icon: '{}'},
 ]
 
 export function Playground() {
   const {
-    url, 
-    isLoading, 
-    result, 
-    activeTab, 
-    recentRuns, 
+    url,
+    isLoading,
+    result,
+    activeTab,
+    recentRuns,
     selectedFormats,
     isAccordionOpen,
-    setUrl, 
-    setIsLoading, 
+    setUrl,
+    setIsLoading,
     setResult,
-    setActiveTab, 
-    addRecentRun, 
+    setActiveTab,
+    addRecentRun,
     updateRecentRun,
     toggleFormat,
-    setAccordionOpen
+    setAccordionOpen,
   } = useAppStore()
 
   const [showFormatDropdown, setShowFormatDropdown] = useState(false)
@@ -84,7 +93,7 @@ export function Playground() {
       url: url.trim(),
       status: 'loading',
       timestamp: new Date(),
-      formats: selectedFormats
+      formats: selectedFormats,
     }
     addRecentRun(newRun)
 
@@ -95,7 +104,6 @@ export function Playground() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer fc-placeholder-api-key',
         },
         body: JSON.stringify({
           url: formattedUrl,
@@ -104,11 +112,9 @@ export function Playground() {
       })
 
       const data = await response.json()
-      console.log('API Response:', data)
 
       if (response.ok) {
         const parsedImages = data.data?.html ? parseImagesFromHtml(data.data.html) : []
-        console.log('Parsed images:', parsedImages)
         const resultData = {success: true, data: {...data.data, images: parsedImages}}
         setResult(resultData)
         updateRecentRun(runId, {status: 'success', result: resultData})
@@ -145,15 +151,19 @@ export function Playground() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Header Section */}
+      <div className="text-center space-y-2 pt-6">
+        <h1 className="text-3xl font-bold">Web Scraper</h1>
+        <p className="text-muted-foreground">Extract content from any website in multiple formats</p>
+      </div>
+
       {/* Input Section */}
       <Card className="shadow-sm border-border">
-        <CardContent className="p-6">
+        <CardContent className="p-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex gap-2">
-              <div className="flex items-center bg-muted px-3 py-2 rounded-md text-sm text-muted-foreground border">
-                https://
-              </div>
+              <div className="flex items-center bg-muted px-3 py-2 rounded-md text-sm text-muted-foreground border">https://</div>
               <input
                 type="text"
                 value={url}
@@ -167,7 +177,7 @@ export function Playground() {
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-2">
                 <Settings2 className="h-4 w-4 text-muted-foreground" />
-                
+
                 <div className="relative">
                   <Button
                     type="button"
@@ -176,22 +186,21 @@ export function Playground() {
                     onClick={() => setShowFormatDropdown(!showFormatDropdown)}
                   >
                     <FileText className="h-4 w-4" />
-                    Format: {selectedFormats.length === 0 ? 'None' : 
-                            selectedFormats.length === 1 ? selectedFormats[0].charAt(0).toUpperCase() + selectedFormats[0].slice(1) :
-                            `${selectedFormats.length} selected`}
+                    Format:{' '}
+                    {selectedFormats.length === 0
+                      ? 'None'
+                      : selectedFormats.length === 1
+                      ? selectedFormats[0].charAt(0).toUpperCase() + selectedFormats[0].slice(1)
+                      : `${selectedFormats.length} selected`}
                     <span className="ml-auto">▼</span>
                   </Button>
 
                   {showFormatDropdown && (
                     <Card className="absolute top-full left-0 mt-2 w-[400px] z-50 shadow-lg">
-                      <CardHeader className="pb-3">
-                        <div className="flex items-center justify-between">
+                      <CardHeader className="p-3">
+                        <div className="flex items-center justify-between mb-0">
                           <CardTitle className="text-base">Format</CardTitle>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => setShowFormatDropdown(false)}
-                          >
+                          <Button variant="ghost" size="sm" onClick={() => setShowFormatDropdown(false)}>
                             ✕
                           </Button>
                         </div>
@@ -216,7 +225,10 @@ export function Playground() {
                             {format.subOptions && selectedFormats.includes(format.id) && (
                               <div className="ml-9 flex gap-4">
                                 {format.subOptions.map((option) => (
-                                  <label key={option.value} className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
+                                  <label
+                                    key={option.value}
+                                    className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer"
+                                  >
                                     <input
                                       type="radio"
                                       name={`${format.id}-option`}
@@ -259,11 +271,7 @@ export function Playground() {
                   <Code className="w-4 h-4 mr-2" />
                   Get code
                 </Button>
-                <Button 
-                  type="submit" 
-                  disabled={!url.trim() || isLoading} 
-                  className="bg-orange-500 hover:bg-orange-600 text-white"
-                >
+                <Button type="submit" disabled={!url.trim() || isLoading} className="bg-orange-500 hover:bg-orange-600 text-white">
                   {isLoading ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -290,11 +298,11 @@ export function Playground() {
 
       {/* Results Accordion */}
       {result && !isLoading && (
-        <Accordion 
-          type="single" 
-          collapsible 
-          value={isAccordionOpen ? "results" : ""}
-          onValueChange={(value) => setAccordionOpen(value === "results")}
+        <Accordion
+          type="single"
+          collapsible
+          value={isAccordionOpen ? 'results' : ''}
+          onValueChange={(value) => setAccordionOpen(value === 'results')}
         >
           <AccordionItem value="results" className="border rounded-lg">
             <div className="flex items-center justify-between px-6">
@@ -302,7 +310,7 @@ export function Playground() {
                 <div className="flex items-center gap-3">
                   <span className="font-semibold">Results</span>
                   {result.success && (
-                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 mr-2">
                       <Check className="w-3 h-3 mr-1" />
                       Success
                     </Badge>
@@ -340,9 +348,7 @@ export function Playground() {
                   </TabsList>
                   <TabsContent value="markdown" className="mt-4">
                     <div className="bg-muted p-4 rounded border max-h-96 overflow-y-auto">
-                      <pre className="whitespace-pre-wrap text-sm font-mono">
-                        {result.data?.markdown || 'No markdown content'}
-                      </pre>
+                      <pre className="whitespace-pre-wrap text-sm font-mono">{result.data?.markdown || 'No markdown content'}</pre>
                     </div>
                   </TabsContent>
                   <TabsContent value="media" className="mt-4">
@@ -361,8 +367,8 @@ export function Playground() {
                                   className="w-full h-full object-cover"
                                   loading="lazy"
                                   onError={(e) => {
-                                    ;(e.target as HTMLImageElement).src =
-                                      'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjVmNWY1Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+SW1hZ2U8L3RleHQ+PC9zdmc+'
+                                    const target = e.target as HTMLImageElement
+                                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjVmNWY1Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+SW1hZ2U8L3RleHQ+PC9zdmc+'
                                   }}
                                 />
                               </div>
@@ -445,15 +451,11 @@ export function Playground() {
                   }
                 }}
               >
-                <CardContent className="p-6 space-y-4">
+                <CardContent className="p-4 space-y-4">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-muted rounded flex items-center justify-center text-lg font-bold">
-                        M
-                      </div>
-                      <span className="font-medium text-sm truncate max-w-[150px]">
-                        {run.url.replace(/^https?:\/\//, '')}
-                      </span>
+                      <div className="w-10 h-10 bg-muted rounded flex items-center justify-center text-lg font-bold">M</div>
+                      <span className="font-medium text-sm truncate max-w-[150px]">{run.url.replace(/^https?:\/\//, '')}</span>
                     </div>
                     <ArrowUpRight className="h-4 w-4 text-orange-500" />
                   </div>
@@ -466,7 +468,7 @@ export function Playground() {
                         Scrape
                       </span>
                     </div>
-                    
+
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Status</span>
                       <span className="flex items-center gap-1">
@@ -492,9 +494,9 @@ export function Playground() {
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Started</span>
                       <div className="text-right">
-                        <div>{run.timestamp.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                        <div>{run.timestamp.toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}</div>
                         <div className="text-xs text-muted-foreground">
-                          {run.timestamp.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                          {run.timestamp.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit'})}
                         </div>
                       </div>
                     </div>
@@ -504,7 +506,7 @@ export function Playground() {
                       <div className="flex gap-2 mt-1">
                         {(run.formats || ['markdown']).map((format) => (
                           <Badge key={format} variant="secondary" className="text-xs">
-                            {getFormatIcon(formatOptions.find(f => f.id === format) || formatOptions[0])}
+                            {getFormatIcon(formatOptions.find((f) => f.id === format) || formatOptions[0])}
                             {format.charAt(0).toUpperCase() + format.slice(1)}
                           </Badge>
                         ))}
