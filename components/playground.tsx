@@ -151,19 +151,19 @@ export function Playground() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6 px-4 sm:px-6">
       {/* Header Section */}
       <div className="text-center space-y-2 pt-6">
-        <h1 className="text-3xl font-bold">Web Scraper</h1>
-        <p className="text-muted-foreground">Extract content from any website in multiple formats</p>
+        <h1 className="text-2xl sm:text-3xl font-bold">Web Scraper</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">Extract content from any website in multiple formats</p>
       </div>
 
       {/* Input Section */}
       <Card className="shadow-sm border-border">
         <CardContent className="p-4">
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="flex gap-2">
-              <div className="flex items-center bg-muted px-3 py-2 rounded-md text-sm text-muted-foreground border">https://</div>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <div className="flex items-center bg-muted px-3 py-2 rounded-md text-sm text-muted-foreground border whitespace-nowrap">https://</div>
               <input
                 type="text"
                 value={url}
@@ -174,9 +174,9 @@ export function Playground() {
               />
             </div>
 
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
               <div className="flex items-center gap-2">
-                <Settings2 className="h-4 w-4 text-muted-foreground" />
+                <Settings2 className="h-4 w-4 text-muted-foreground hidden sm:block" />
 
                 <div className="relative">
                   <Button
@@ -196,7 +196,7 @@ export function Playground() {
                   </Button>
 
                   {showFormatDropdown && (
-                    <Card className="absolute top-full left-0 mt-2 w-[400px] z-50 shadow-lg">
+                    <Card className="absolute top-full left-0 right-0 sm:left-0 sm:right-auto mt-2 w-full sm:w-[400px] z-50 shadow-lg">
                       <CardHeader className="p-3">
                         <div className="flex items-center justify-between mb-0">
                           <CardTitle className="text-base">Format</CardTitle>
@@ -266,19 +266,21 @@ export function Playground() {
                 </div>
               </div>
 
-              <div className="flex gap-2">
-                <Button variant="outline" type="button">
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Button variant="outline" type="button" className="w-full sm:w-auto">
                   <Code className="w-4 h-4 mr-2" />
-                  Get code
+                  <span className="hidden sm:inline">Get code</span>
+                  <span className="sm:hidden">Code</span>
                 </Button>
-                <Button type="submit" disabled={!url.trim() || isLoading} className="bg-orange-500 hover:bg-orange-600 text-white">
+                <Button type="submit" disabled={!url.trim() || isLoading} className="bg-orange-500 hover:bg-orange-600 text-white w-full sm:w-auto">
                   {isLoading ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Scraping...
+                      <span className="hidden sm:inline">Scraping...</span>
+                      <span className="sm:hidden">Loading...</span>
                     </>
                   ) : (
-                    'Start scraping'
+                    <span>Start scraping</span>
                   )}
                 </Button>
               </div>
@@ -341,10 +343,10 @@ export function Playground() {
             <AccordionContent className="px-6 pb-6">
               {result.success ? (
                 <Tabs value={activeTab} onValueChange={(value: string) => setActiveTab(value as typeof activeTab)} className="w-full">
-                  <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="markdown">Markdown</TabsTrigger>
-                    <TabsTrigger value="media">Media ({result.data?.images?.length || 0})</TabsTrigger>
-                    <TabsTrigger value="raw">Raw JSON</TabsTrigger>
+                  <TabsList className="grid w-full grid-cols-3 h-auto p-1">
+                    <TabsTrigger value="markdown" className="text-xs sm:text-sm py-1.5">Markdown</TabsTrigger>
+                    <TabsTrigger value="media" className="text-xs sm:text-sm py-1.5">Media ({result.data?.images?.length || 0})</TabsTrigger>
+                    <TabsTrigger value="raw" className="text-xs sm:text-sm py-1.5">Raw JSON</TabsTrigger>
                   </TabsList>
                   <TabsContent value="markdown" className="mt-4">
                     <div className="bg-muted p-4 rounded border max-h-96 overflow-y-auto">
@@ -354,7 +356,7 @@ export function Playground() {
                   <TabsContent value="media" className="mt-4">
                     <div className="bg-muted p-4 rounded border max-h-96 overflow-y-auto">
                       {result.data?.images && result.data.images.length > 0 ? (
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-4">
                           {result.data.images.map((image, index) => (
                             <div
                               key={index}
@@ -438,7 +440,7 @@ export function Playground() {
       {recentRuns.length > 0 && (
         <div>
           <h2 className="text-lg font-semibold mb-4">Recent Runs</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {recentRuns.map((run) => (
               <Card
                 key={run.id}
@@ -451,16 +453,16 @@ export function Playground() {
                   }
                 }}
               >
-                <CardContent className="p-4 space-y-4">
+                <CardContent className="p-4 space-y-3">
                   <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-muted rounded flex items-center justify-center text-lg font-bold">M</div>
-                      <span className="font-medium text-sm truncate max-w-[150px]">{run.url.replace(/^https?:\/\//, '')}</span>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-muted rounded flex items-center justify-center text-sm sm:text-lg font-bold">M</div>
+                      <span className="font-medium text-xs sm:text-sm truncate max-w-[120px] sm:max-w-[150px]">{run.url.replace(/^https?:\/\//, '')}</span>
                     </div>
                     <ArrowUpRight className="h-4 w-4 text-orange-500" />
                   </div>
 
-                  <div className="space-y-3 text-sm">
+                  <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Endpoint</span>
                       <span className="flex items-center gap-1">
